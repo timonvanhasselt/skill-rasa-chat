@@ -1,7 +1,6 @@
 To submit your skill, replace this file with text from
 https://rawgit.com/MycroftAI/mycroft-skills/master/meta_editor.html
 
-
 ## rasa-chat
 Adapter to chat with an existing Rasa bot via rest channel
 
@@ -15,7 +14,27 @@ Once you're chatting, this skill will override most Mycroft functionality, and y
 ## Examples
 * "chat with bot"
 * "talk to rasa"
-* "stop"
+
+## Handy commands
+
+### Start Ovos CLI
+```
+ovos-cli-client
+```
+
+### Restart mycroft
+```
+systemctl --user restart mycroft
+```
+
+### Restart mycroft skill
+```
+systemctl --user restart mycroft-skills
+```
+### Tail the skill log
+```
+tail -f /var/log/mycroft/skills.log
+```
 
 ## Credits
 jamesmf
