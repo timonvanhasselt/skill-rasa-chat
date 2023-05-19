@@ -20,9 +20,9 @@ class RasaSkill(MycroftSkill):
         self.log.info("Done loading Rasa skill")
         self.conversation_active = False
         self.convoID = 1
-        self.init_msg = "Insert the welcome message here"
-        self.end_msg = "Insert the goodbye message here"
-        self.RASA_API = "http://localhost:5005/webhooks/rest/webhook"
+        self.init_msg = "Insert the welcome message here" #change this to your own welcome message
+        self.end_msg = "Insert the goodbye message here" #change this to your own goodbye message
+        self.RASA_API = "http://localhost:5005/webhooks/rest/webhook" #change this to your own Rasa REST endpoint
         self.messages = []
         self.session = requests.Session()
 
