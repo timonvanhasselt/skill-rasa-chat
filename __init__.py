@@ -26,7 +26,6 @@ class RasaSkill(MycroftSkill):
         self.messages = []
         self.session = requests.Session()
 
-
     def send_message_to_rasa(self, msg) -> list:
         """
         Send a message to Rasa REST endpoint.
@@ -52,10 +51,25 @@ class RasaSkill(MycroftSkill):
         """
         for next_response in data:
             if "text" in next_response:
+                # append to messages list
                 self.messages.append(next_response["text"])
+                # flush retry
+                self.retry = 0
 
         if len(self.messages) == 0:
             self.messages = ["no response from rasa"]
+
+    def retry_handler(self, msg):
+        """
+        Handle the retry logic for when the mic is opened but no response is given.
+        """
+        #TODO: Check a better way to handle empty responses when opening the mic
+        if self.retry == 3:
+            self.stop()
+
+        if msg is None:
+            self.retry += 1
+            self.query_rasa("")
 
     def query_rasa(self, prompt=None):
         """
@@ -65,16 +79,11 @@ class RasaSkill(MycroftSkill):
         :return: The response from the chatbot.
         """
         if self.conversation_active == False:
-            self.speak(self.end_msg)
-            return
-
-        if prompt is None and len(self.messages) > 0:
-            prompt = self.messages[-1]
+            return self.end_msg
 
         msg = self.get_response(prompt, num_retries=0)
-        if msg is None:
-            return
-            
+
+        self.retry_handler(msg)
         # flush messages
         self.messages = []
         # get rasa response
@@ -105,6 +114,7 @@ class RasaSkill(MycroftSkill):
         self.update_messages(welcome_response)
         # join messages list
         prompt = " ".join(self.messages)
+        # send prompt
         self.query_rasa(prompt)
 
     @intent_handler(IntentBuilder("StopChat").require("Stop"))
@@ -115,13 +125,13 @@ class RasaSkill(MycroftSkill):
         self.stop()
         self.query_rasa()
 
-    @intent_handler(IntentBuilder("ResumeChat").require("Resume"))
-    def handle_resume_chat(self, message) -> None:
-        """
-        Handle the intent to resume a chat with the Rasa chatbot.
-        """
-        self.conversation_active = True
-        self.query_rasa()
+    # @intent_handler(IntentBuilder("ResumeChat").require("Resume"))
+    # def handle_resume_chat(self, message) -> None:
+    #     """
+    #     Handle the intent to resume a chat with the Rasa chatbot.
+    #     """
+    #     self.conversation_active = True
+    #     self.query_rasa()
 
 def create_skill():
     return RasaSkill()
