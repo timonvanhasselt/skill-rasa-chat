@@ -49,6 +49,8 @@ class RasaSkill(MycroftSkill):
 
         :param data: The response data from the Rasa REST endpoint.
         """
+        # flush messages
+        self.messages = []
         for next_response in data:
             if "text" in next_response:
                 # append to messages list
@@ -59,17 +61,15 @@ class RasaSkill(MycroftSkill):
         if len(self.messages) == 0:
             self.messages = ["no response from rasa"]
 
-    def retry_handler(self, msg):
+    def retry_handler(self):
         """
         Handle the retry logic for when the mic is opened but no response is given.
         """
         #TODO: Check a better way to handle empty responses when opening the mic
-        if self.retry == 3:
+        if self.retry == 2:
             self.stop()
-
-        if msg is None:
+        else:
             self.retry += 1
-            self.query_rasa("")
 
     def query_rasa(self, prompt=None):
         """
@@ -79,21 +79,23 @@ class RasaSkill(MycroftSkill):
         :return: The response from the chatbot.
         """
         if self.conversation_active == False:
-            return self.end_msg
-
+            self.speak_dialog(self.end_msg)
+            return
+        # get the user response
         msg = self.get_response(prompt, num_retries=0)
+        if msg:
+            # get rasa response
+            data = self.send_message_to_rasa(msg)
+            # update the messages list
+            self.update_messages(data)
+            # join the messages list
+            join_messages = " ".join(self.messages)
+            # play messages
+            return self.query_rasa(join_messages)
 
-        self.retry_handler(msg)
-        # flush messages
-        self.messages = []
-        # get rasa response
-        data = self.send_message_to_rasa(msg)
-        # update the messages list
-        self.update_messages(data)
-        # join the messages list
-        prompt = " ".join(self.messages)
-
-        return self.query_rasa(prompt)
+        else:
+            self.retry_handler()
+            return self.query_rasa()
 
     def stop(self) -> None:
         """
