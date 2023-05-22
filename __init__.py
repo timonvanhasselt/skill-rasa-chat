@@ -1,7 +1,5 @@
 from adapt.intent import IntentBuilder
 from mycroft.skills.core import MycroftSkill, intent_handler
-from mycroft.util.log import LOG
-from mycroft.util.parse import match_one
 import requests
 
 class RasaSkill(MycroftSkill):
@@ -20,7 +18,7 @@ class RasaSkill(MycroftSkill):
         self.log.info("Done loading Rasa skill")
         self.conversation_active = False
         self.convoID = 1
-        self.init_msg = "Insert the welcome message here" #change this to your own welcome message
+        self.start_msg = "Insert the welcome message here" #change this to your own welcome message
         self.end_msg = "Insert the goodbye message here" #change this to your own goodbye message
         self.RASA_API = "http://localhost:5005/webhooks/rest/webhook" #change this to your own Rasa REST endpoint
         self.messages = []
@@ -111,7 +109,7 @@ class RasaSkill(MycroftSkill):
         self.convoID += 1
         self.conversation_active = True
         # send welcome message to rasa
-        welcome_response = self.send_message_to_rasa(self.init_msg)
+        welcome_response = self.send_message_to_rasa(self.start_msg)
         # update messages list
         self.update_messages(welcome_response)
         # join messages list
