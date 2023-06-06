@@ -1,6 +1,7 @@
 from adapt.intent import IntentBuilder
 from mycroft.skills.core import MycroftSkill, intent_handler
 import requests
+import re
 
 class RasaSkill(MycroftSkill):
     """
@@ -21,8 +22,20 @@ class RasaSkill(MycroftSkill):
         self.start_msg = "Insert the welcome message here" #change this to your own welcome message
         self.end_msg = "Insert the goodbye message here" #change this to your own goodbye message
         self.RASA_API = "http://localhost:5005/webhooks/rest/webhook" #change this to your own Rasa REST endpoint
+        self.prosody_rate = "slow" #change this to your own prosody rate
         self.messages = []
         self.session = requests.Session()
+
+    def add_ssml_tags(self, text: str) -> str:
+        """
+        Add SSML tags to the speech if not present.
+
+        :param text: The text to add SSML tags to.
+        :return: The text with SSML tags added.
+        """
+        if not re.search(r'<speak>.*</speak>', text):
+            text = f'<speak><prosody rate={self.prosody_rate}>{text}</prosody></speak>'
+        return text
 
     def send_message_to_rasa(self, msg) -> list:
         """
@@ -51,11 +64,16 @@ class RasaSkill(MycroftSkill):
         self.messages = []
         for next_response in data:
             if "text" in next_response:
+                ssml_text = self.add_ssml_tags(next_response["text"])
                 # append to messages list
-                self.messages.append(next_response["text"])
+                self.messages.append(ssml_text)
                 # flush retry
                 self.retry = 0
-
+            if "custom" in next_response:
+                command = next_response.get("custom",{}).get("commands")
+                if command == "stop":
+                    self.stop()
+            
         if len(self.messages) == 0:
             self.messages = ["no response from rasa"]
 
@@ -76,7 +94,7 @@ class RasaSkill(MycroftSkill):
         :param prompt: The prompt to send to the Rasa chatbot.
         :return: The response from the chatbot.
         """
-        if self.conversation_active == False:
+        if self.conversation_active is False:
             self.speak_dialog(self.end_msg)
             return
         # get the user response
@@ -109,7 +127,7 @@ class RasaSkill(MycroftSkill):
         self.convoID += 1
         self.conversation_active = True
         # send welcome message to rasa
-        welcome_response = self.send_message_to_rasa(self.start_msg)
+        welcome_response = self.send_message_to_rasa(self.init_msg)
         # update messages list
         self.update_messages(welcome_response)
         # join messages list
