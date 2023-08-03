@@ -10,7 +10,7 @@ class RasaSkill(OVOSSkill):
     """
     Mycroft/OVOS skill that acts as an interface between a Rasa chatbot and a user,
     allowing continuous voice dialog between the two.
-    """.
+    """
         super().__init__(*args, **kwargs)
 
     def initialize(self):
