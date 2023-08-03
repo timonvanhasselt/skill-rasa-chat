@@ -7,12 +7,15 @@ import re
 
 class RasaSkill(OVOSSkill):
     def __init__(self, *args, **kwargs):
+        super(RasaSkill, self).__init__(*args, **kwargs)
+        self.skill_id = "ovos-rasa-skill"
+    
         """
         Mycroft/OVOS skill that acts as an interface between a Rasa chatbot and a user,
         allowing continuous voice dialog between the two.
         """
-        super().__init__(*args, **kwargs)
-
+    
+    
     def initialize(self):
         """
         Initialize the RasaSkill by setting the Rasa REST endpoint and setting up variables.
