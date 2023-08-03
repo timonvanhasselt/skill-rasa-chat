@@ -3,7 +3,7 @@ import os
 from setuptools import setup
 from os import walk, path
 
-URL = "https://github.com/OpenVoiceOS/skill-ovos-hello-world"
+URL = "https://github.com/timonvanhasselt/skill-rasa-chat"
 SKILL_CLAZZ = "RasaChatSkill"  # needs to match __init__.py class name
 PYPI_NAME = "ovos-rasa-skill"  # pip install PYPI_NAME
 
