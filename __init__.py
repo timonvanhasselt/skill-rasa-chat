@@ -1,17 +1,17 @@
-from adapt.intent import IntentBuilder
+from ovos_utils.intents import IntentBuilder
 from ovos_workshop.skills import OVOSSkill
 from ovos_workshop.decorators import intent_handler
 import requests
 import re
 
-class RasaSkill(MycroftSkill):
-    """
-    Mycroft skill that acts as an interface between a Rasa chatbot and a user,
-    allowing continuous voice dialog between the two.
-    """
 
-    def __init__(self):
-        MycroftSkill.__init__(self)
+class RasaSkill(OVOSSkill):
+    def __init__(self, *args, **kwargs):
+    """
+    Mycroft/OVOS skill that acts as an interface between a Rasa chatbot and a user,
+    allowing continuous voice dialog between the two.
+    """.
+        super().__init__(*args, **kwargs)
 
     def initialize(self):
         """
@@ -151,6 +151,3 @@ class RasaSkill(MycroftSkill):
     #     """
     #     self.conversation_active = True
     #     self.query_rasa()
-
-def create_skill():
-    return RasaSkill()
