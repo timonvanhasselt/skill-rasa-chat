@@ -11,7 +11,7 @@ class RasaSkill(OVOSSkill):
         self.skill_id = "ovos-rasa-skill"
     
         """
-        Mycroft/OVOS skill that acts as an interface between a Rasa chatbot and a user,
+        OVOS skill that acts as an interface between a Rasa chatbot and a user,
         allowing continuous voice dialog between the two.
         """
     
