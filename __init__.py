@@ -1,5 +1,6 @@
 from adapt.intent import IntentBuilder
-from mycroft.skills.core import MycroftSkill, intent_handler
+from ovos_workshop.skills import OVOSSkill
+from ovos_workshop.decorators import intent_handler
 import requests
 import re
 
